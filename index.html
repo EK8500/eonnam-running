@@ -306,7 +306,7 @@ tr:last-child td{border-bottom:none}
       <button class="tab-btn" onclick="switchRankTab('part',this)">참여</button>
     </div>
     <div style="margin-bottom:.75rem;font-size:11px;background:var(--g2-l);color:var(--g2-dp);border:0.5px solid var(--g2-m);border-radius:var(--radius-md);padding:7px 10px;display:inline-block">
-      종합 점수 = 달린 거리 50% + 참여 횟수 30% + 출석률 20%
+      종합 점수 = 달린 거리 70% + 출석률 30%
     </div>
     <div id="ranking-list"></div>
   </div>
@@ -483,7 +483,7 @@ function getSS(sid){
   return{dist,attend,parts:recs.length};
 }
 function calcScore(dist,attend,parts,maxD,maxP){
-  return(maxD>0?(dist/maxD)*50:0)+(maxP>0?(parts/maxP)*30:0)+attend*0.2;
+  return(maxD>0?(dist/maxD)*70:0)+attend*0.3;
 }
 function getCS(grade,cls){
   const ss=MASTER.filter(s=>s.grade==grade&&s.cls==cls);
@@ -533,7 +533,7 @@ function openAuthModal(){
 }
 function closeAuthModal(){document.getElementById('modal-auth').classList.remove('open');}
 function tryLogin(){
-  const ADMIN_PW='858597';
+  const ADMIN_PW='858596';
   const input=document.getElementById('pw-input').value;
   const err=document.getElementById('pw-error');
   err.style.display='block';
@@ -754,17 +754,19 @@ function renderStudents(){
   document.getElementById('student-table').innerHTML=h;
 }
 
+function todayKST(){return new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());}
+function fmtYMD(dt){return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0');}
 function initRecord(){
   const d=document.getElementById('rec-date');
-  if(!d.value)d.value=new Date().toISOString().split('T')[0];
+  if(!d.value)d.value=todayKST();
   updateDateInfo();renderRecordedDates();
   if(isAdmin)loadDayRecord();
 }
 function changeDate(delta){
   if(!isAdmin)return;
   const d=document.getElementById('rec-date');
-  const dt=new Date((d.value||new Date().toISOString().split('T')[0])+'T00:00:00');
-  dt.setDate(dt.getDate()+delta);d.value=dt.toISOString().split('T')[0];
+  const dt=new Date((d.value||todayKST())+'T00:00:00');
+  dt.setDate(dt.getDate()+delta);d.value=fmtYMD(dt);
   updateDateInfo();loadDayRecord();
 }
 function updateDateInfo(){
@@ -1013,7 +1015,7 @@ function printHTML(title, bodyHTML){
   win.document.close();
 }
 
-function nowStr(){return new Date().toLocaleDateString('ko-KR');}
+function nowStr(){return new Date().toLocaleDateString('ko-KR',{timeZone:'Asia/Seoul'});}
 
 // ══════════════════════════════════════════════════
 // 개인별 기록 인쇄
@@ -1107,7 +1109,7 @@ function printClassReport(){
     <div class="sub">
       <span>📋 대상: ${fg?GN[fg]+' ':' 전체 학년 '}${clsFilter?clsFilter+'반':''}</span>
       <span>📆 인쇄일: ${nowStr()}</span>
-      <span>📊 점수 = 달린 거리 50% + 참여 횟수 30% + 출석률 20%</span>
+      <span>📊 점수 = 달린 거리 70% + 출석률 30%</span>
     </div>`;
 
   grades.forEach(g=>{
@@ -1217,7 +1219,7 @@ function printRankingReport(){
   const bodyHTML=`
     <h1>🏆 언남고 굿모닝 러닝 크루 · 학급 종합 순위</h1>
     <div class="sub">
-      <span>📊 종합 점수 = 달린 거리 50% + 참여 횟수 30% + 출석률 20%</span>
+      <span>📊 종합 점수 = 달린 거리 70% + 출석률 30%</span>
       <span>📆 인쇄일: ${nowStr()}</span>
     </div>
     ${gradeSummary}
@@ -1333,7 +1335,7 @@ function printRecord(){
       <div class="info-item">📅 ${dateStr}</div>
       <div class="info-item">🏫 ${GN[gr]} ${c}반</div>
       ${hr.name?`<div class="info-item">👨‍🏫 담임: ${hr.name} 선생님</div>`:''}
-      <div class="info-item">📆 인쇄: ${new Date().toLocaleDateString('ko-KR')}</div>
+      <div class="info-item">📆 인쇄: ${new Date().toLocaleDateString('ko-KR',{timeZone:'Asia/Seoul'})}</div>
     </div>
   </div>
   <div class="stats">
